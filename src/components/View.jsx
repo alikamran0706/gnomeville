@@ -252,7 +252,6 @@ const Box = ({ meshConfig, setLoading }) => {
 
   useEffect(() => {
     if (fbx) {
-      setLoading(false);
       fbx.traverse((child) => {
         if (child.isMesh) {
           if (meshConfig[child.name]) {
@@ -260,6 +259,7 @@ const Box = ({ meshConfig, setLoading }) => {
             child.material.metalness = 1;
             child.material.roughness = 1;
             child.material.needsUpdate = true;
+            setLoading(false);
           }
         }
       });
