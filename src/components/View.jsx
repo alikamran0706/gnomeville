@@ -1,4 +1,4 @@
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+import { Canvas, useLoader } from '@react-three/fiber';
 import { ContactShadows, OrbitControls } from '@react-three/drei';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
@@ -10,7 +10,7 @@ import * as THREE from 'three';
 const tabs = [
   { id: "Cap", icon: "🧢" },
   { id: "Clothes", icon: "🥼" },
-  { id: "Beard", icon: "🥸" },
+  { id: "Beard", icon: "🧔🏽‍♂️" },
 ];
 const capIcons = [
   "/cap-boy-baseball-svgrepo-com.svg",
@@ -68,15 +68,11 @@ export default function HomePage() {
     setSelectedShape(index - 1)
     setMeshConfig((prevConfig) => {
       const updatedConfig = { ...prevConfig };
-
-      // Reset visibility for all costumes
       Object.keys(updatedConfig).forEach((key) => {
         if (key.startsWith('Costume') || key === 'Red_C_Costume') {
           updatedConfig[key].visible = false;
         }
       });
-
-      // Enable the selected costume
       updatedConfig[`Costume${index}_Low`].visible = true;
 
       return updatedConfig;
@@ -87,14 +83,11 @@ export default function HomePage() {
     setSelectedShape(index - 1)
     setMeshConfig((prevConfig) => {
       const updatedConfig = { ...prevConfig };
-
-      // Reset visibility for all hats
       Object.keys(updatedConfig).forEach((key) => {
         if (key.startsWith('Hat') || key === 'Red_C_Hat') {
           updatedConfig[key].visible = false;
         }
       });
-      // Enable the selected hat
       updatedConfig[`Hat${index}_low`].visible = true;
 
       return updatedConfig;
@@ -104,14 +97,11 @@ export default function HomePage() {
     setSelectedShape(index - 1)
     setMeshConfig((prevConfig) => {
       const updatedConfig = { ...prevConfig };
-
-      // Reset visibility for all beards
       Object.keys(updatedConfig).forEach((key) => {
         if (key.startsWith('Beard') || key === 'Red_C_Beard') {
           updatedConfig[key].visible = false;
         }
       });
-      // Enable the selected beard
       updatedConfig[`Beard${index}_low`].visible = true;
 
       return updatedConfig;
@@ -144,7 +134,7 @@ export default function HomePage() {
   }, [selectedTab]);
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between w-full">
-      <div className="w-full lg:w-1/2 flex flex-col gap-y-8 px-4 lg:px-12 mt-8 lg:mt-24">
+      <div className="w-full lg:w-auto flex flex-col gap-y-8 px-4 lg:px-12 mt-8 lg:mt-24">
         <div className="flex mb-4 overflow-x-auto flex-wrap gap-x-4">
           {tabs.map((tab) => (
             <button
@@ -191,7 +181,7 @@ export default function HomePage() {
         )}
       </div>
 
-      <div className="w-full lg:w-1/2 h-[90vh] flex items-center justify-center">
+      <div className="w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center">
         <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows>
           <Suspense fallback={null}>
             <ambientLight intensity={3.5} />
@@ -265,15 +255,7 @@ const Box = ({ meshConfig }) => {
       }
     }
   }, [])
-  useFrame((_, delta) => {
-    if (mixer.current) {
-      mixer.current.update(delta);
-    }
 
-    if (modelRef.current) {
-      modelRef.current.rotation.y += 0.01; 
-    }
-  });
   
-  return <primitive ref={modelRef} object={fbx} scale={[0.04, 0.04, 0.04]} position={[0, -2, 0]} />;
+  return <primitive ref={modelRef} object={fbx} scale={[0.044, 0.044, 0.044]} position={[0, -2.2, 0]} />;
 };
