@@ -16,6 +16,7 @@ const Loading = ({ setIsLoading }) => {
         timeline.fromTo(outlineImageRef.current, { opacity: 0 }, { opacity: 1, duration: 1 }, '-=0.5'); // Overlap with the white image
         timeline.fromTo(grayImageRef.current, { opacity: 0 }, { opacity: 1, duration: 1 }, '-=0.5');
         timeline.fromTo(logoRef.current, { opacity: 0, }, { opacity: 1, duration: 1.5 }, '-=0.5');
+        if(setIsLoading)
         timeline.call(() => setIsLoading(false), null, '+=1'); // Hide loading after animations
     }, []);
     return (

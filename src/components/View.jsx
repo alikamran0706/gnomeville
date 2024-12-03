@@ -6,6 +6,7 @@ import { TextureLoader } from 'three';
 import Image from 'next/image';
 import gsap from 'gsap';
 import * as THREE from 'three';
+import Loading from './Loading';
 
 const tabs = [
   { id: "Cap", icon: "🧢" },
@@ -33,13 +34,14 @@ const beardIcons = [
   "/fluffy-moustache-svgrepo-com.svg",
 ];
 
-export default function HomePage() {
+export default function HomePage({loading, setLoading}) {
   const [selectedTab, setSelectedTab] = useState("Cap");
   const [selectedShape, setSelectedShape] = useState(null);
   const capRef = useRef([]);
   const costumeRef = useRef([]);
   const beardRef = useRef([]);
   const timeline = useRef(null);
+
   const [meshConfig, setMeshConfig] = useState({
     Costume1_Low: { visible: false },
     Costume2_Low: { visible: false },
@@ -134,54 +136,57 @@ export default function HomePage() {
   }, [selectedTab]);
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between w-full">
-      <div className="w-full lg:w-auto flex flex-col gap-y-8 px-4 lg:px-12 mt-8 lg:mt-24">
-        <div className="flex mb-4 overflow-x-auto flex-wrap gap-x-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              className={`flex flex-col items-center px-2 py-1 lg:px-4 lg:py-2 ${selectedTab === tab.id ? 'text-blue-500 font-bold' : 'text-gray-400'
-                }`}
-              onClick={() => {
-                setSelectedShape(null);
-                setSelectedTab(tab.id);
-              }}
-            >
-              <div className="text-base lg:text-xl">{tab.icon}</div>
-              <span className="text-xs lg:text-sm">{tab.id}</span>
-            </button>
-          ))}
+      {
+        !loading &&
+        <div className="w-full lg:w-auto flex flex-col gap-y-8 px-4 lg:px-12 mt-8 lg:mt-24">
+          <div className="flex mb-4 overflow-x-auto flex-wrap gap-x-4">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`flex flex-col items-center px-2 py-1 lg:px-4 lg:py-2 ${selectedTab === tab.id ? 'text-blue-500 font-bold' : 'text-gray-400'
+                  }`}
+                onClick={() => {
+                  setSelectedShape(null);
+                  setSelectedTab(tab.id);
+                }}
+              >
+                <div className="text-base lg:text-xl">{tab.icon}</div>
+                <span className="text-xs lg:text-sm">{tab.id}</span>
+              </button>
+            ))}
+          </div>
+
+          {selectedTab === 'Cap' ? (
+            <Category
+              title="Cap"
+              items={capIcons}
+              refs={capRef}
+              onClick={(i) => changeGapHandler(i + 1)}
+
+
+              selectedShape={selectedShape}
+            />
+          ) : selectedTab === 'Clothes' ? (
+            <Category
+              title="Costume"
+              items={costumeIcons}
+              refs={costumeRef}
+              onClick={(i) => changeCostumeHandler(i + 1)}
+              selectedShape={selectedShape}
+            />
+          ) : (
+            <Category
+              title="Beard"
+              items={beardIcons}
+              refs={beardRef}
+              onClick={(i) => changeBeardHandler(i + 1)}
+              selectedShape={selectedShape}
+            />
+          )}
         </div>
+      }
 
-        {selectedTab === 'Cap' ? (
-          <Category
-            title="Cap"
-            items={capIcons}
-            refs={capRef}
-            onClick={(i) => changeGapHandler(i + 1)}
-
-
-            selectedShape={selectedShape}
-          />
-        ) : selectedTab === 'Clothes' ? (
-          <Category
-            title="Costume"
-            items={costumeIcons}
-            refs={costumeRef}
-            onClick={(i) => changeCostumeHandler(i + 1)}
-            selectedShape={selectedShape}
-          />
-        ) : (
-          <Category
-            title="Beard"
-            items={beardIcons}
-            refs={beardRef}
-            onClick={(i) => changeBeardHandler(i + 1)}
-            selectedShape={selectedShape}
-          />
-        )}
-      </div>
-
-      <div className="w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center">
+      <div className={loading ? 'w-full' : `w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center`}>
         <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows>
           <Suspense fallback={<Loader />}>
             <ambientLight intensity={3.5} />
@@ -193,7 +198,11 @@ export default function HomePage() {
               minPolarAngle={0}
               maxPolarAngle={Math.PI / 2}
             />
-            <Box meshConfig={meshConfig} />
+            <Box 
+              meshConfig={meshConfig} 
+              loading={loading}
+              setLoading={setLoading}
+            />
             <ContactShadows position={[0, -1.4, 0]} opacity={0.75} scale={10} blur={3} far={4} />
           </Suspense>
         </Canvas>
@@ -202,14 +211,15 @@ export default function HomePage() {
     </div>
   );
 }
-const Loader = () => {
+const Loader = ({setLoading}) => {
   return (
     <Html>
-      <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
+      {/* <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
         <div className="w-[10vw] h-[10vw] rounded-full text-white">
           Loading...
         </div>
-      </div>
+      </div> */}
+      <Loading setIsLoading={null} />
     </Html>
   )
 }
@@ -234,7 +244,7 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
   </div>
 );
 
-const Box = ({ meshConfig }) => {
+const Box = ({ meshConfig, setLoading, loading }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');
   const mixer = useRef(null);
   const modelRef = useRef(null);
@@ -243,6 +253,7 @@ const Box = ({ meshConfig }) => {
 
   useEffect(() => {
     if (fbx) {
+      setLoading(false);
       fbx.traverse((child) => {
         if (child.isMesh) {
           if (meshConfig[child.name]) {
@@ -255,6 +266,7 @@ const Box = ({ meshConfig }) => {
       });
     }
   }, [fbx, meshConfig, costume1BaseColor]);
+
 
   useEffect(() => {
     if (fbx) {
