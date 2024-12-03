@@ -200,7 +200,6 @@ export default function HomePage({loading, setLoading}) {
             />
             <Box 
               meshConfig={meshConfig} 
-              loading={loading}
               setLoading={setLoading}
             />
             <ContactShadows position={[0, -1.4, 0]} opacity={0.75} scale={10} blur={3} far={4} />
@@ -211,7 +210,7 @@ export default function HomePage({loading, setLoading}) {
     </div>
   );
 }
-const Loader = ({setLoading}) => {
+const Loader = () => {
   return (
     <Html>
       {/* <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
@@ -244,7 +243,7 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
   </div>
 );
 
-const Box = ({ meshConfig, setLoading, loading }) => {
+const Box = ({ meshConfig, setLoading }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');
   const mixer = useRef(null);
   const modelRef = useRef(null);
