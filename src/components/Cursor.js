@@ -43,7 +43,6 @@ export default function Cursor() {
   const [isClient, setIsClient] = useState(false);
   const [resolution, setResolution] = useState([1, 1]);
   const [isHovered, setIsHovered] = useState(false); // Track hover state
-  const [isClicking, setIsClicking] = useState(false); // Track clicking state
   const { camera, mouse, scene } = useThree(); // Destructure mouse and camera from the context
 
   useEffect(() => {
@@ -79,11 +78,9 @@ export default function Cursor() {
       window.addEventListener("mousemove", handleMouseMove);
 
       // Handle click events
-      const handleClick = (event) => {
+      const handleClick = () => {
         if (cursorRef.current && isHovered) {
-          // Perform the click action when hovering over an interactive object
           console.log("Cursor clicked on interactive object!");
-          // You can trigger specific actions here, such as calling a function on the button
         }
       };
 

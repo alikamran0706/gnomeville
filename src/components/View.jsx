@@ -195,12 +195,8 @@ export default function HomePage() {
         <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows>
           <Suspense fallback={null}>
             <ambientLight intensity={3.5} />
-
             <pointLight position={[0.1, -0.5, 2]} decay={0} intensity={0.1} />
-            {/* <directionalLight intensity={0.5} position={[0.1, -0.1,0]} castShadow /> */}
-            {/* <directionalLight intensity={1} position={[10, 10, 10]} castShadow /> */}
             <spotLight intensity={0.7} position={[5, 10, 5]} angle={0.3} penumbra={0.5} castShadow />
-
             <OrbitControls
               enablePan={false}
               enableZoom={false}
@@ -240,57 +236,17 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
 
 const Box = ({ meshConfig }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');
-  // const costume1Texture = useLoader(TextureLoader, '/models/Costumes_Low_Costume1Mat_AlbedoTransparency1.png');
   const mixer = useRef(null);
   const modelRef = useRef(null);
 
   const costume1BaseColor = useLoader(TextureLoader, '/models/Costume1Mat_Base_color.png');
-  const costume1Metallic = useLoader(TextureLoader, '/models/Costume1Mat_Metallic.png');
-  const costume1Normal = useLoader(TextureLoader, '/models/Costume1Mat_Normal_OpenGL.png');
-  const costume1Roughness = useLoader(TextureLoader, '/models/Costume1Mat_Roughness.png');
-
-  const costume2Texture = useLoader(TextureLoader, '/models/Costume2Mat_Base_color.png');
-  const costume3Texture = useLoader(TextureLoader, '/models/Costume3Mat_Base_color.png');
-  const costume4Texture = useLoader(TextureLoader, '/models/Costume4Mat_Base_color.png');
-  const costume5Texture = useLoader(TextureLoader, '/models/Costume5Mat_Base_color.png');
-
-  // const hatTexture = useLoader(TextureLoader, '/models/HatsAndBeardsMat_Base_color.png');
-  // const hatMetallicTexture = useLoader(TextureLoader, '/models/HatsAndBeardsMat_Metallic.png');
-  // const hatNormalTexture = useLoader(TextureLoader, '/models/HatsAndBeardsMat_Normal_OpenGL.png');
-
 
   useEffect(() => {
     if (fbx) {
       fbx.traverse((child) => {
         if (child.isMesh) {
-          // Set visibility dynamically based on meshConfig
           if (meshConfig[child.name]) {
             child.visible = meshConfig[child.name].visible;
-
-            // Apply textures dynamically
-            if (child.name === 'Costume1_Low') {
-              // child.material.map = costume1Texture;
-              // child.material.map = costume1BaseColor; // Base color texture
-              // child.material.metalnessMap = costume1Metallic; // Metallic map
-              // child.material.normalMap = costume1Normal; // Normal map
-              // child.material.roughnessMap = costume1Roughness; // Roughness map
-
-            } else if (child.name === 'Costume2_Low') {
-              // child.material.map = costume2Texture;
-            } else if (child.name === 'Costume3_Low') {
-              // child.material.map = costume3Texture;
-            } else if (child.name === 'Costume4_Low') {
-              // child.material.map = costume4Texture;
-            } else if (child.name === 'Costume5_Low') {
-              // child.material.map = costume5Texture;
-            }
-
-            // if (child.name.startsWith("Hat") || child.name.startsWith("Beard") || child.name === 'Red_C_Hat' 
-            // ) {
-            //   child.material.map = hatTexture; 
-            //   child.material.metalnessMap = hatMetallicTexture; 
-            //   child.material.normalMap = hatNormalTexture; 
-            // }
             child.material.metalness = 1;
             child.material.roughness = 1;
             child.material.needsUpdate = true;
@@ -298,17 +254,12 @@ const Box = ({ meshConfig }) => {
         }
       });
     }
-  }, [fbx, meshConfig, costume1BaseColor, costume2Texture, costume3Texture, costume4Texture, costume5Texture]);
+  }, [fbx, meshConfig, costume1BaseColor]);
 
   useEffect(() => {
     if (fbx) {
       if (fbx.animations && fbx.animations.length > 0) {
-        console.log('Animations:', fbx.animations);
-
-        // Create an AnimationMixer
         mixer.current = new THREE.AnimationMixer(fbx);
-
-        // Play the first animation
         const action = mixer.current.clipAction(fbx.animations[0]);
         action.play();
       }

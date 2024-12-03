@@ -12,22 +12,11 @@ const Loading = ({ setIsLoading }) => {
     useEffect(() => {
         // GSAP Timeline for sequential animations
         const timeline = gsap.timeline({ defaults: { ease: 'power1.inOut', duration: 1 } });
-
-        // Animate white image
         timeline.fromTo(whiteImageRef.current, { opacity: 0 }, { opacity: 1, duration: 1 });
-
-        // Animate outline image
         timeline.fromTo(outlineImageRef.current, { opacity: 0 }, { opacity: 1, duration: 1 }, '-=0.5'); // Overlap with the white image
-
-        // Animate gray image
         timeline.fromTo(grayImageRef.current, { opacity: 0 }, { opacity: 1, duration: 1 }, '-=0.5');
-
-        // Animate logo after everything else
         timeline.fromTo(logoRef.current, { opacity: 0, }, { opacity: 1, duration: 1.5 }, '-=0.5');
-
-        // Final step: After all animations, hide the loading screen and show the page content
         timeline.call(() => setIsLoading(false), null, '+=1'); // Hide loading after animations
-
     }, []);
     return (
         <div
