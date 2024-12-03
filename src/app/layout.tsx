@@ -3,14 +3,18 @@
 import './globals.css'
 import { useState } from 'react';
 import Loading from '@/components/Loading';
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isLoading, setIsLoading] = useState(true);
   return (
     <html lang="en">
       <body >{
         isLoading ? (
           <Loading
-            isLoading={isLoading}
+            // isLoading={isLoading}
             setIsLoading={setIsLoading}
           />
         ) :
