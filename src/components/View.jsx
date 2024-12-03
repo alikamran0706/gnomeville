@@ -1,5 +1,5 @@
 import { Canvas, useLoader } from '@react-three/fiber';
-import { ContactShadows, OrbitControls } from '@react-three/drei';
+import { ContactShadows, Html, OrbitControls } from '@react-three/drei';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { TextureLoader } from 'three';
@@ -183,7 +183,7 @@ export default function HomePage() {
 
       <div className="w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center">
         <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows>
-          <Suspense fallback={null}>
+          <Suspense fallback={<Loader />}>
             <ambientLight intensity={3.5} />
             <pointLight position={[0.1, -0.5, 2]} decay={0} intensity={0.1} />
             <spotLight intensity={0.7} position={[5, 10, 5]} angle={0.3} penumbra={0.5} castShadow />
@@ -202,7 +202,17 @@ export default function HomePage() {
     </div>
   );
 }
-
+const Loader = () => {
+  return (
+    <Html>
+      <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
+        <div className="w-[10vw] h-[10vw] rounded-full text-white">
+          Loading...
+        </div>
+      </div>
+    </Html>
+  )
+}
 const Category = ({ title, items, refs, onClick, selectedShape }) => (
   <div>
     <div className="text-gray-200 font-semibold text-xl mb-5">{title}</div>
