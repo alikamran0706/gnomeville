@@ -11,7 +11,7 @@ import './gnome.css';
 const tabs = [
   { id: "Cap", icon: "🧢" },
   { id: "Clothes", icon: "🥼" },
-  { id: "Beard", icon: "🧔🏽‍♂️" },
+  { id: "Beard", icon: "🧔🏽" },
 ];
 const capIcons = [
   "/cap-boy-baseball-svgrepo-com.svg",
