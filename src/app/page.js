@@ -50,7 +50,7 @@ export default function Home() {
     };
 
     useEffect(() => {
-        sectionsRef.current?.forEach((section, i) => {
+        sectionsRef.current?.forEach((section) => {
             // Animate sections turning black and restoring color on scroll
             gsap.to(section, {
                 backgroundColor: "black",
