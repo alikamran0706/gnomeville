@@ -46,6 +46,11 @@ export default function Cursor() {
   const { camera, mouse, scene } = useThree(); // Destructure mouse and camera from the context
 
   useEffect(() => {
+    const canvasElement = document.querySelector('canvas');
+    if (canvasElement) {
+      canvasElement.style.visibility = "visible"; // Show the canvas
+      canvasElement.style.opacity = "1"; // Make it visible
+    }
     if (typeof window !== "undefined") {
       setIsClient(true);
 

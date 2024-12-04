@@ -189,7 +189,7 @@ export default function HomePage({loading, setLoading}) {
       }
 
       <div className={loading ? 'w-full' : `w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center`}>
-        <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows id='custom-canvas'>
+        <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows className='custom-canvas'>
           <Suspense fallback={<Loader />}>
             <ambientLight intensity={3.5} />
             <pointLight position={[0.1, -0.5, 2]} decay={0} intensity={0.1} />
@@ -284,7 +284,7 @@ const Box = ({ meshConfig, setLoading, loading }) => {
       setAnimationTriggered(true); // Ensure the animation only triggers once
   
       // Make the canvas and modelContainerRef visible before animation starts
-      const canvasElement = document.getElementById('custom-canvas');
+      const canvasElement = document.querySelector('canvas');
       if (canvasElement) {
         canvasElement.style.visibility = "visible"; // Show the canvas
         canvasElement.style.opacity = "1"; // Make it visible
