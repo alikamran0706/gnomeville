@@ -6,6 +6,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import Loading from './Loading';
+import './gnome.css'; 
 
 const tabs = [
   { id: "Cap", icon: "🧢" },
