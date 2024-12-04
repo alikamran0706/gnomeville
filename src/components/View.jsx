@@ -2,7 +2,6 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { ContactShadows, Html, OrbitControls } from '@react-three/drei';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { TextureLoader } from 'three';
 import Image from 'next/image';
 import gsap from 'gsap';
 import * as THREE from 'three';
@@ -134,8 +133,10 @@ export default function HomePage({loading, setLoading}) {
       animateItems(beardRef.current);
     }
   }, [selectedTab]);
+  
+  
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between w-full">
+    <div className="flex flex-col lg:flex-row lg:justify-between w-full" >
       {
         !loading &&
         <div className="w-full lg:w-auto flex flex-col gap-y-8 px-4 lg:px-12 mt-8 lg:mt-24">
@@ -201,6 +202,7 @@ export default function HomePage({loading, setLoading}) {
             <Box 
               meshConfig={meshConfig} 
               setLoading={setLoading}
+              loading={loading}
             />
             <ContactShadows position={[0, -1.4, 0]} opacity={0.75} scale={10} blur={3} far={4} />
           </Suspense>
@@ -243,12 +245,12 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
   </div>
 );
 
-const Box = ({ meshConfig, setLoading }) => {
+const Box = ({ meshConfig, setLoading, loading }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');
   const mixer = useRef(null);
-  const modelRef = useRef(null);
+  const modelContainerRef = useRef(null);
 
-  const costume1BaseColor = useLoader(TextureLoader, '/models/Costume1Mat_Base_color.png');
+  const [animationTriggered, setAnimationTriggered] = useState(false); // Track animation state
 
   useEffect(() => {
     if (fbx) {
@@ -264,8 +266,7 @@ const Box = ({ meshConfig, setLoading }) => {
         }
       });
     }
-  }, [fbx, meshConfig, costume1BaseColor]);
-
+  }, [fbx, meshConfig]);
 
   useEffect(() => {
     if (fbx) {
@@ -275,8 +276,47 @@ const Box = ({ meshConfig, setLoading }) => {
         action.play();
       }
     }
-  }, [])
+  }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined" && modelContainerRef.current && !loading && !animationTriggered) {
+      setAnimationTriggered(true); // Ensure the animation only triggers once
   
-  return <primitive ref={modelRef} object={fbx} scale={[0.044, 0.044, 0.044]} position={[0, -2.2, 0]} />;
+      // Make the canvas and modelContainerRef visible before animation starts
+      const canvasElement = document.querySelector('canvas');
+      if (canvasElement) {
+        canvasElement.style.visibility = "visible"; // Show the canvas
+        canvasElement.style.opacity = "1"; // Make it visible
+      }
+  
+      // Set initial hidden state for the model
+      gsap.set(modelContainerRef.current.scale, { x: 0.8, y: 0.8, z: 0.8 });
+      gsap.set(modelContainerRef.current, { opacity: 0 });
+  
+      // Animate the model into view
+      gsap.to(modelContainerRef.current.scale, {
+        x: 1,
+        y: 1,
+        z: 1,
+        duration: 1,
+        ease: 'power3.in',
+        delay: 0.5,
+      });
+      gsap.to(modelContainerRef.current, {
+        opacity: 1,
+        duration: 1,
+        ease: "power3.in",
+        delay: 0.5,
+      });
+    }
+  }, [loading, animationTriggered]);
+  
+  
+
+  return (
+    <group ref={modelContainerRef}>
+      <primitive object={fbx} scale={[0.044, 0.044, 0.044]} position={[0, -2.2, 0]} />
+    </group>
+  );
 };
+
