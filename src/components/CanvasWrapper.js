@@ -1,7 +1,13 @@
 import { Canvas } from "@react-three/fiber";
 import Cursor from "./Cursor";
+import { useEffect, useState } from "react";
 
-const CursorScene = () => {
+const CursorScene = (props) => {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true); // Ensure rendering only happens on the client
+  }, []);
+  if (!isClient) return null; 
   return (
     <Canvas
       style={{
@@ -22,7 +28,7 @@ const CursorScene = () => {
       }}
     >
       <ambientLight intensity={0.5} />
-      <Cursor />
+      <Cursor {...props} />
     </Canvas>
   );
 };

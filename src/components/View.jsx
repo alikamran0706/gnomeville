@@ -228,23 +228,41 @@ const Loader = () => {
 const Category = ({ title, items, refs, onClick, selectedShape }) => (
   <div>
     <div className="text-gray-200 font-semibold text-xl mb-5">{title}</div>
-    <div className="rounded-full text-center p-2 gap-x-4 flex flex-wrap">
+    <div className="rounded-full text-center px-2 gap-x-4 flex flex-wrap">
       {items.map((icon, i) => (
         <div
           key={i}
-          className={`rounded-full bg-white ${selectedShape === i
-              ? "shadow-indigo-500/50 border-2 border-indigo-600 h-28 w-28 scale-110"
-              : "h-24 w-24 scale-100"
-            } flex items-center justify-center cursor-pointer`}
+          className={`mt-4 rounded-full bg-white flex items-center justify-center cursor-pointer
+            ${selectedShape === i
+              ? "shadow-indigo-500/50 border-2 border-indigo-600 scale-110"
+              : "scale-100"
+            }
+            // Default sizes (adjust sizes for smaller screens)
+            h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24
+            // Increased size when selected
+            ${selectedShape === i ? "h-[75px] w-[75px] md:h-24 md:w-24 lg:h-28 lg:w-28" : ""}
+          `}
           ref={(el) => (refs.current[i] = el)}
           onClick={() => onClick(i)}
         >
-          <Image src={icon} alt={`${title} ${i + 1}`} width={64} height={64} className="rounded-full" />
+          <Image
+            src={icon}
+            alt={`${title} ${i + 1}`}
+            width={64}
+            height={64}
+            className={`rounded-full
+              // Image size based on screen size
+              w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20
+              // Increase image size for selected item
+              ${selectedShape === i ? "w-12 h-12 md:w-20 md:h-20 lg:w-24 lg:h-24" : ""}
+            `}
+          />
         </div>
       ))}
     </div>
   </div>
 );
+
 
 const Box = ({ meshConfig, setLoading, loading }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');

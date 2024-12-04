@@ -62,11 +62,11 @@ const AboutUs = () => {
           {/* Using the Image component correctly */}
           <Image src="/logo.png" alt="Logo" width={82} height={82} />
         </Link>
-        <h1 ref={headerRef} className="text-5xl font-bold mt-14">About Us</h1>
+        <h1 ref={headerRef} className="text-3xl md:text-5xl font-bold mt-14">About Us</h1>
         <div className="flex flex-col items-center justify-center h-1/2">
           <p
             ref={textRef}
-            className="text-xl w-full pt-12 lg:pt-0 lg:w-1/2 font-poppins tracking-widest"
+            className="text-md xl:text-xl w-full pt-12 lg:pt-0 lg:w-1/2 font-poppins tracking-widest"
           >
             {/* Empty text initially, GSAP will animate the typing effect */}
           </p>

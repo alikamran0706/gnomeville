@@ -1,10 +1,8 @@
 import { useRef, useEffect, useState } from "react";
-import { useFrame, extend, useThree } from "@react-three/fiber";
+import { useFrame, extend } from "@react-three/fiber";
 import { shaderMaterial } from "@react-three/drei";
 import { gsap } from "gsap";
-import { Raycaster } from "three";
 
-// Custom Shader Material for the ring
 const MirrorMaterial = shaderMaterial(
   {
     uTime: 0,
@@ -34,22 +32,21 @@ const MirrorMaterial = shaderMaterial(
   }`
 );
 
-// Extend to the THREE namespace
 extend({ MirrorMaterial });
 
 export default function Cursor() {
   const cursorRef = useRef();
-  const raycasterRef = useRef(new Raycaster()); // Raycaster instance
   const [isClient, setIsClient] = useState(false);
   const [resolution, setResolution] = useState([1, 1]);
-  const [isHovered, setIsHovered] = useState(false); // Track hover state
-  const { camera, mouse, scene } = useThree(); // Destructure mouse and camera from the context
+  const isHovered =false;
+  const inactivityTimer = useRef(null);
+  const isMouseMoving = useRef(false);
 
   useEffect(() => {
-    const canvasElement = document.querySelector('canvas');
+    const canvasElement = document.querySelector("canvas");
     if (canvasElement) {
-      canvasElement.style.visibility = "visible"; // Show the canvas
-      canvasElement.style.opacity = "1"; // Make it visible
+      canvasElement.style.visibility = "visible";
+      canvasElement.style.opacity = "1";
     }
     if (typeof window !== "undefined") {
       setIsClient(true);
@@ -57,11 +54,15 @@ export default function Cursor() {
       const updateResolution = () => {
         setResolution([window.innerWidth, window.innerHeight]);
       };
-
+      
       updateResolution();
       window.addEventListener("resize", updateResolution);
 
       const handleMouseMove = (event) => {
+        isMouseMoving.current = true;
+        // handleMouse()
+        clearTimeout(inactivityTimer.current);
+
         const { clientX: x, clientY: y } = event;
         const aspectRatio = window.innerWidth / window.innerHeight;
 
@@ -75,14 +76,19 @@ export default function Cursor() {
           gsap.to(cursorRef.current.position, {
             x: worldX,
             y: worldY,
-            duration: 0.2,
+            duration: 3,
           });
         }
+
+        // Start timer for random movement
+        inactivityTimer.current = setTimeout(() => {
+          isMouseMoving.current = false;
+          startRandomMovement();
+        }, 1000); // 1 second of inactivity
       };
 
       window.addEventListener("mousemove", handleMouseMove);
 
-      // Handle click events
       const handleClick = () => {
         if (cursorRef.current && isHovered) {
           console.log("Cursor clicked on interactive object!");
@@ -90,7 +96,7 @@ export default function Cursor() {
       };
 
       window.addEventListener("click", handleClick);
-
+      startRandomMovement();
       return () => {
         window.removeEventListener("mousemove", handleMouseMove);
         window.removeEventListener("resize", updateResolution);
@@ -99,41 +105,27 @@ export default function Cursor() {
     }
   }, [isHovered]);
 
-  // Update raycaster position and check for hover status
-  useFrame(() => {
-    if (cursorRef.current && raycasterRef.current) {
-      // Set raycaster position and direction (from camera)
-      raycasterRef.current.ray.origin.copy(camera.position);
-      raycasterRef.current.ray.direction.set(mouse.x, -mouse.y, 0.5).normalize();
+  const startRandomMovement = () => {
+    if (!isMouseMoving.current) {
+      const randomX = (Math.random() - 0.5) * 10; 
+      const randomY = (Math.random() - 0.5) * 10; 
 
-      // Get all intersected objects, including the ring itself
-      const intersects = raycasterRef.current.intersectObjects(scene.children);
-
-      // Check if the ray intersects any objects (ring or interactive elements)
-      const isIntersecting = intersects.some((intersect) => {
-        return intersect.object === cursorRef.current || intersect.object.userData?.interactive;
-      });
-
-      if (isIntersecting) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
-
-      // Update the hover state of the material
-      if (cursorRef.current.material.uniforms.uHover) {
-        cursorRef.current.material.uniforms.uHover.value = isHovered ? 1.0 : 0.0;
+      if (cursorRef.current) {
+        gsap.to(cursorRef.current.position, {
+          x: randomX,
+          y: randomY,
+          duration: 18,
+          onComplete: startRandomMovement, 
+        });
       }
     }
-  });
+  };
 
   useFrame(({ clock }) => {
     if (cursorRef.current?.material?.uniforms) {
       cursorRef.current.material.uniforms.uTime.value = clock.getElapsedTime();
     }
   });
-
-  if (!isClient) return null;
 
   return (
     <>
@@ -144,7 +136,7 @@ export default function Cursor() {
           <mirrorMaterial
             attach="material"
             uResolution={resolution}
-            uHover={isHovered ? 1.0 : 0.0} // Pass hover state to the shader
+            uHover={isHovered ? 1.0 : 0.0}
           />
         )}
       </mesh>
