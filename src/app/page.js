@@ -11,6 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Home() {
     const sectionsRef = useRef([]);
     const collapseRef = useRef([]);
+    const cursorRef = useRef();
+
     const [activeIndex, setActiveIndex] = useState(null);
 
     const sections = [
@@ -26,28 +28,6 @@ export default function Home() {
             link: "/gnome"
         },
     ];
-
-    const handleMouseEnter = (index) => {
-        setActiveIndex(index);
-        const section = collapseRef.current[index];
-        gsap.to(section.querySelector(".description"), {
-            height: "auto",
-            opacity: 1,
-            duration: 0.5,
-            ease: "power3.out",
-        });
-    };
-
-    const handleMouseLeave = (index) => {
-        setActiveIndex(null);
-        const section = collapseRef.current[index];
-        gsap.to(section.querySelector(".description"), {
-            height: 0,
-            opacity: 0,
-            duration: 0.5,
-            ease: "power3.out",
-        });
-    };
 
     useEffect(() => {
         sectionsRef.current?.forEach((section) => {
@@ -74,17 +54,18 @@ export default function Home() {
         const textSpans = textRef.current.querySelectorAll("span");
 
         const { clientX, clientY } = event;
-
+        // Loop through each text span and calculate the distance from the cursor
         textSpans.forEach((span) => {
             const spanRect = span.getBoundingClientRect();
             const spanCenterX = spanRect.left + spanRect.width / 2;
             const spanCenterY = spanRect.top + spanRect.height / 2;
 
+            // Calculate the distance between the ring's center (clientX, clientY) and the center of each span
             const distance = Math.sqrt(
                 Math.pow(clientX - spanCenterX, 2) + Math.pow(clientY - spanCenterY, 2)
             );
 
-            // Animate spans within a certain distance
+            // Highlight the text if the distance is within a certain range
             if (distance < 100) {
                 gsap.to(span, {
                     scale: 1.5,
@@ -104,22 +85,32 @@ export default function Home() {
             }
         });
     };
-    useEffect(() => {
-        if (typeof window !== "undefined" && typeof window !== undefined) {
-           
 
-            window.addEventListener("mousemove", handleMouseMove);
+    const handleMouseEnter = (index) => {
+        setActiveIndex(index);
+        const section = collapseRef.current[index];
+        gsap.to(section.querySelector(".description"), {
+            height: "auto",
+            opacity: 1,
+            duration: 0.5,
+            ease: "power3.out",
+        });
+    };
 
-            return () => {
-                window.removeEventListener("mousemove", handleMouseMove);
-            };
-        }
-    }, []);
-
+    const handleMouseLeave = (index) => {
+        setActiveIndex(null);
+        const section = collapseRef.current[index];
+        gsap.to(section.querySelector(".description"), {
+            height: 0,
+            opacity: 0,
+            duration: 0.5,
+            ease: "power3.out",
+        });
+    };
 
     return (
         <div className="font-sans relative">
-            <Cursor />
+            <Cursor handleMouse={handleMouseMove} cursorRef={cursorRef} />
             {/* Header Section */}
             <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white">
                 {/* Logo in the Top Left Corner */}
@@ -134,11 +125,11 @@ export default function Home() {
                     >
                         About Us
                     </Link>
-                </div>
+                </div> 
                 {/* Main Content */}
                 <div className="text-center">
                     <h1
-                        className="text-5xl md:text-8xl font-extrabold mb-4 tracking-wide cursor-pointer"
+                        className="text-5xl md:text-8xl font-extrabold mb-4 tracking-wide"
                         ref={textRef}
                     >
                         {"GnomeVille".split("").map((char, index) => (

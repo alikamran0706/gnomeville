@@ -39,6 +39,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  cursor: none;
 }
 /* Glowing animation for the light */
 /* Glowing effect animation */
@@ -73,3 +74,15 @@ body {
   transform: scaleY(-1); /* Flip the image vertically */
 }
 
+.cursor {
+  height: 2rem;
+  width: 2rem;
+  background-color: white;
+  border-radius: 2rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  mix-blend-mode: difference;
+  transform-origin: center;
+  transition: all 0.1s ease-out;
+}

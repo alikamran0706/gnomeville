@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from "react";
-import { useFrame, extend } from "@react-three/fiber";
+import { useFrame, extend, useThree } from "@react-three/fiber";
 import { shaderMaterial } from "@react-three/drei";
 import { gsap } from "gsap";
-
+import * as THREE from 'three';
 const MirrorMaterial = shaderMaterial(
   {
     uTime: 0,
@@ -34,13 +34,13 @@ const MirrorMaterial = shaderMaterial(
 
 extend({ MirrorMaterial });
 
-export default function Cursor() {
-  const cursorRef = useRef();
+export default function Cursor({ handleMouse, cursorRef }) {
   const [isClient, setIsClient] = useState(false);
   const [resolution, setResolution] = useState([1, 1]);
-  const isHovered =false;
+  const isHovered = false;
   const inactivityTimer = useRef(null);
   const isMouseMoving = useRef(false);
+  const { camera } = useThree(); // Get the camera reference
 
   useEffect(() => {
     const canvasElement = document.querySelector("canvas");
@@ -54,13 +54,13 @@ export default function Cursor() {
       const updateResolution = () => {
         setResolution([window.innerWidth, window.innerHeight]);
       };
-      
+
       updateResolution();
       window.addEventListener("resize", updateResolution);
 
       const handleMouseMove = (event) => {
         isMouseMoving.current = true;
-        // handleMouse()
+        handleMouse(event)
         clearTimeout(inactivityTimer.current);
 
         const { clientX: x, clientY: y } = event;
@@ -107,19 +107,41 @@ export default function Cursor() {
 
   const startRandomMovement = () => {
     if (!isMouseMoving.current) {
-      const randomX = (Math.random() - 0.5) * 10; 
-      const randomY = (Math.random() - 0.5) * 10; 
-
+      const randomX = (Math.random() - 0.5) * 10;
+      const randomY = (Math.random() - 0.5) * 10;
+  
       if (cursorRef.current) {
         gsap.to(cursorRef.current.position, {
           x: randomX,
           y: randomY,
           duration: 18,
-          onComplete: startRandomMovement, 
+          onUpdate: () => {
+            if (!isMouseMoving.current && cursorRef.current) { // Check if mouse is moving
+              const { x, y, z } = cursorRef.current.position;
+  
+              // Convert world position to screen coordinates
+              const worldPosition = new THREE.Vector3(x, y, z);
+              worldPosition.project(camera);
+  
+              const clientX = ((worldPosition.x + 1) / 2) * window.innerWidth;
+              const clientY = ((-worldPosition.y + 1) / 2) * window.innerHeight;
+  
+              const event = {
+                clientX,
+                clientY,
+              };
+              handleMouse(event);
+              console.log(
+                `Screen Position: X=${clientX.toFixed(2)}, Y=${clientY.toFixed(2)}`
+              );
+            }
+          },
+          onComplete: startRandomMovement,
         });
       }
     }
   };
+  
 
   useFrame(({ clock }) => {
     if (cursorRef.current?.material?.uniforms) {
