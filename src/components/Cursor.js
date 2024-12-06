@@ -131,9 +131,9 @@ export default function Cursor({ handleMouse, cursorRef }) {
                 clientY,
               };
               handleMouse(event);
-              console.log(
-                `Screen Position: X=${clientX.toFixed(2)}, Y=${clientY.toFixed(2)}`
-              );
+              // console.log(
+              //   `Screen Position: X=${clientX.toFixed(2)}, Y=${clientY.toFixed(2)}`
+              // );
             }
           },
           onComplete: startRandomMovement,
@@ -148,6 +148,12 @@ export default function Cursor({ handleMouse, cursorRef }) {
       cursorRef.current.material.uniforms.uTime.value = clock.getElapsedTime();
     }
   });
+
+  useEffect(() => {
+    return () => {
+      gsap.killTweensOf(cursorRef.current?.position);
+    };
+  }, []);
 
   return (
     <>

@@ -43,7 +43,8 @@ const AboutUs = () => {
   }, []);
 
   return (
-    <section className="relative w-full h-screen bg-black overflow-hidden">
+    <section className="relative w-full h-screen bg-black overflow-hidden"  style={{
+      cursor: 'auto' }}>
       {/* Glowing light border */}
       <div
         className="absolute inset-0 w-full h-full bg-cover bg-no-repeat"

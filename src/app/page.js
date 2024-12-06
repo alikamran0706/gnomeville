@@ -51,7 +51,7 @@ export default function Home() {
     const textRef = useRef(null);
 
     const handleMouseMove = (event) => {
-        const textSpans = textRef.current.querySelectorAll("span");
+        const textSpans = textRef.current?.querySelectorAll("span");
 
         const { clientX, clientY } = event;
         // Loop through each text span and calculate the distance from the cursor
@@ -84,8 +84,79 @@ export default function Home() {
                 });
             }
         });
-    };
 
+        let hoveredIndex = null;
+
+        // Check which section is being hovered
+        collapseRef.current?.forEach((section, index) => {
+          if (!section) return;
+      
+          const rect = section.getBoundingClientRect();
+      
+          // Check if the cursor's position is within the section's vertical bounds
+          if (clientY >= rect.top && clientY <= rect.bottom+30) {
+            hoveredIndex = index; // Set the index of the hovered section
+          }
+        });
+      
+        // If a section is hovered, activate it
+        if (hoveredIndex !== null) {
+          if (hoveredIndex !== activeIndex) {
+            setActiveIndex(hoveredIndex); // Update active index
+      
+            // Animate only the hovered section
+            collapseRef.current?.forEach((section, index) => {
+              if (index === hoveredIndex) {
+                // Apply hover animation
+                gsap.to(section.querySelector(".description"), {
+                  height: "auto",
+                  opacity: 1,
+                  duration: 0.4,
+                  ease: "power3.out",
+                });
+      
+                // Add active styles
+                section.style.color = "#00f2ff"; // Example: Active color
+              } else {
+                // Reset styles and animation for all other sections
+                gsap.to(section.querySelector(".description"), {
+                  height: 0,
+                  opacity: 0,
+                  duration: 0.2,
+                  ease: "power3.out",
+                });
+      
+                // Reset to default styles
+                section.style.color = ""; // Reset color to default
+              }
+            });
+          }
+        } else {
+            setActiveIndex(null);
+
+            collapseRef.current?.forEach((section) => {
+              // Check if the section's description is still animated or visible
+              const description = section.querySelector(".description");
+              const isAnimated = gsap.getProperty(description, "height") !== "0px" || gsap.getProperty(description, "opacity") > 0;
+          
+              if (isAnimated) {
+                // Reset all animations and styles
+                gsap.to(description, {
+                  height: 0,
+                  opacity: 0,
+                  duration: 0.4,
+                  ease: "power3.out",
+                });
+          
+                // Reset styles to default
+                section.style.color = ""; // Reset color to default
+              }
+            });
+        }
+      
+
+    };
+   
     const handleMouseEnter = (index) => {
         setActiveIndex(index);
         const section = collapseRef.current[index];
@@ -108,6 +179,54 @@ export default function Home() {
         });
     };
 
+    useEffect(() => {
+        return () => {
+            collapseRef.current?.forEach((section) => {
+                if (section) {
+                    gsap.killTweensOf(section.querySelector(".description"));
+                }
+            });
+        };
+    }, []);
+
+
+
+    const handleCustomCursorClick = () => {
+        const { x, y, z } = cursorRef.current.position;
+        const worldPosition = new THREE.Vector3(x, y, z);
+        worldPosition.project(camera);
+      
+        const clientX = ((worldPosition.x + 1) / 2) * window.innerWidth;
+        const clientY = ((-worldPosition.y + 1) / 2) * window.innerHeight;
+      
+        console.log(`Cursor Position: clientX=${clientX}, clientY=${clientY}`);
+      
+        const linkElement = document.querySelector(".about-us-link");
+        const rect = linkElement.getBoundingClientRect();
+      
+        console.log(`Link Bounds: top=${rect.top}, right=${rect.right}, bottom=${rect.bottom}, left=${rect.left}`);
+      
+        if (
+          clientX >= rect.left &&
+          clientX <= rect.right &&
+          clientY >= rect.top &&
+          clientY <= rect.bottom
+        ) {
+          console.log("Cursor intersects with the 'About Us' link");
+          linkElement.click(); // Simulate a click
+        }
+      };
+      
+      
+      // Add click event listener
+      useEffect(() => {
+        window.addEventListener("click", handleCustomCursorClick);
+      
+        // Cleanup on component unmount
+        return () => {
+          window.removeEventListener("click", handleCustomCursorClick);
+        };
+      }, []);
     return (
         <div className="font-sans relative">
             <Cursor handleMouse={handleMouseMove} cursorRef={cursorRef} />
@@ -120,12 +239,12 @@ export default function Home() {
                     </div>
                     {/* About Us Button */}
                     <Link
-                        href="/about-us"
-                        className="text-xl absolute top-6 right-6 cursor-pointer text-gray-300 font-bold py-2 px-6 bg-transparent hover:text-[#6ee7b7] hover:underline transition-all duration-300"
+                        href="/about-us"  style={{ zIndex: 10 }}
+                        className="text-xl absolute top-6 right-6 cursor-none text-gray-300 font-bold py-2 px-6 bg-transparent hover:text-[#6ee7b7] hover:underline transition-all duration-300"
                     >
                         About Us
                     </Link>
-                </div> 
+                </div>
                 {/* Main Content */}
                 <div className="text-center">
                     <h1
@@ -166,7 +285,7 @@ export default function Home() {
                             const linkContent = (
                                 <div
                                     ref={(el) => (collapseRef.current[index] = el)}
-                                    className="border-t border-gray-300 overflow-hidden cursor-pointer py-4"
+                                    className="border-t border-gray-300 overflow-hidden py-4"
                                     onMouseEnter={() => handleMouseEnter(index)}
                                     onMouseLeave={() => handleMouseLeave(index)}
                                 >
@@ -190,7 +309,7 @@ export default function Home() {
                             );
 
                             return isInternalLink ? (
-                                <Link key={index} href={section.link}>
+                                <Link key={index} href={section.link} className="cursor-none">
                                     {linkContent}
                                 </Link>
                             ) : (
@@ -199,7 +318,7 @@ export default function Home() {
                                     href={section.href}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block"
+                                    className="block cursor-none"
                                 >
                                     {linkContent}
                                 </a>
