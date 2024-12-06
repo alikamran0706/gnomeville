@@ -6,7 +6,7 @@ import Image from 'next/image';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import Loading from './Loading';
-import './gnome.css';
+import './gnome.css'; 
 
 const tabs = [
   { id: "Cap", icon: "🧢" },
@@ -34,8 +34,7 @@ const beardIcons = [
   "/fluffy-moustache-svgrepo-com.svg",
 ];
 
-export default function HomePage({ loading, setLoading }) {
-  const [orbitEnabled, setOrbitEnabled] = useState(true);
+export default function HomePage({loading, setLoading}) {
   const [selectedTab, setSelectedTab] = useState("Cap");
   const [selectedShape, setSelectedShape] = useState(null);
   const capRef = useRef([]);
@@ -115,12 +114,12 @@ export default function HomePage({ loading, setLoading }) {
     timeline.current = gsap.timeline();
     timeline.current.fromTo(
       items,
-      { x: -100, opacity: 0 },
+      { x: -100, opacity: 0 }, 
       {
         x: 0,
         opacity: 1,
         duration: 0.7,
-        stagger: 0.2,
+        stagger: 0.2, 
         ease: "power3.out",
       }
     );
@@ -135,10 +134,8 @@ export default function HomePage({ loading, setLoading }) {
       animateItems(beardRef.current);
     }
   }, [selectedTab]);
-  useEffect(() => {
-    console.log(orbitEnabled, ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,')
-  }, [orbitEnabled])
-
+  
+  
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between w-full" >
       {
@@ -192,26 +189,24 @@ export default function HomePage({ loading, setLoading }) {
       }
 
       <div className={loading ? 'w-full' : `w-full lg:w-[calc(100%-43rem)] h-[90vh] flex items-center justify-center`}>
-        <Canvas camera={{ fov: 85 }} shadows className='custom-canvas'>
-          <ambientLight intensity={3.5} />
-          <pointLight position={[0.1, -0.5, 2]} decay={0} intensity={0.1} />
-          <spotLight intensity={0.7} position={[5, 10, 5]} angle={0.3} penumbra={0.5} castShadow />
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            enabled={orbitEnabled}
-            minPolarAngle={0}
-            maxPolarAngle={Math.PI / 2}
-          />
+        <Canvas style={{ width: '100%', height: '85.5vh' }} camera={{ fov: 85 }} dpr={[1, 2]} shadows className='custom-canvas'>
           <Suspense fallback={<Loader />}>
-            <Box
-              meshConfig={meshConfig}
+            <ambientLight intensity={3.5} />
+            <pointLight position={[0.1, -0.5, 2]} decay={0} intensity={0.1} />
+            <spotLight intensity={0.7} position={[5, 10, 5]} angle={0.3} penumbra={0.5} castShadow />
+            <OrbitControls
+              enablePan={false}
+              enableZoom={false}
+              minPolarAngle={0}
+              maxPolarAngle={Math.PI / 2}
+            />
+            <Box 
+              meshConfig={meshConfig} 
               setLoading={setLoading}
               loading={loading}
-              setOrbitEnabled={setOrbitEnabled}
             />
+            <ContactShadows position={[0, -1.4, 0]} opacity={0.75} scale={10} blur={3} far={4} />
           </Suspense>
-          <ContactShadows position={[0, -1.4, 0]} opacity={0.75} scale={10} blur={3} far={4} />
         </Canvas>
       </div>
 
@@ -246,7 +241,7 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
             h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24
             // Increased size when selected
             ${selectedShape === i ? "h-[75px] w-[75px] md:h-24 md:w-24 lg:h-28 lg:w-28" : ""}
-          `}
+          `} 
           ref={(el) => (refs.current[i] = el)}
           onClick={() => onClick(i)}
         >
@@ -269,7 +264,7 @@ const Category = ({ title, items, refs, onClick, selectedShape }) => (
 );
 
 
-const Box = ({ meshConfig, setLoading, loading, setOrbitEnabled }) => {
+const Box = ({ meshConfig, setLoading, loading }) => {
   const fbx = useLoader(FBXLoader, '/models/RatchetCostumesRigged.fbx');
   const mixer = useRef(null);
   const modelContainerRef = useRef(null);
@@ -305,18 +300,18 @@ const Box = ({ meshConfig, setLoading, loading, setOrbitEnabled }) => {
   useEffect(() => {
     if (typeof window !== "undefined" && modelContainerRef.current && !loading && !animationTriggered) {
       setAnimationTriggered(true); // Ensure the animation only triggers once
-
+  
       // Make the canvas and modelContainerRef visible before animation starts
       const canvasElement = document.querySelector('canvas');
       if (canvasElement) {
         canvasElement.style.visibility = "visible"; // Show the canvas
         canvasElement.style.opacity = "1"; // Make it visible
       }
-
+  
       // Set initial hidden state for the model
       gsap.set(modelContainerRef.current.scale, { x: 0.8, y: 0.8, z: 0.8 });
       gsap.set(modelContainerRef.current, { opacity: 0 });
-
+  
       // Animate the model into view
       gsap.to(modelContainerRef.current.scale, {
         x: 1,
@@ -334,16 +329,15 @@ const Box = ({ meshConfig, setLoading, loading, setOrbitEnabled }) => {
       });
     }
   }, [loading, animationTriggered]);
-
-
+  
+  
 
   return (
-    <group ref={modelContainerRef}
-      onClick={()=> console.log('clickkkkkkkkkkkkkkkkkked')}
-      onPointerOver={() => console.log(false)} // Disable OrbitControls when hovering
-      onPointerOut={() => setOrbitEnabled(true)} // Enable OrbitControls when pointer leaves
-      onPointerDown={() => setOrbitEnabled(false)} // Disable on click
-      onPointerUp={() => setOrbitEnabled(true)} // Enable on release
+    <group 
+      ref={modelContainerRef}
+      onPointerOver={() => console.log(true)}
+      onPointerOut={() => console.log(false)}
+      onClick={() => console.log('cffff')}
     >
       <primitive object={fbx} scale={[0.044, 0.044, 0.044]} position={[0, -2.2, 0]} />
     </group>

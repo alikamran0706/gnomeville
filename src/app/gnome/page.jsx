@@ -15,7 +15,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   return (
-    <div className="w-full h-full min-h-screen flex flex-col font-[family-name:var(--font-geist-sans)]">
+    <div className="w-full h-full min-h-screen flex flex-col font-[family-name:var(--font-geist-sans)]" style={{
+      cursor: 'auto' }}>
       <main className="w-full min-h-screen bg-gradient-to-tr from-slate-900 to-gray-500 flex flex-col">
         {/* Header */}
         {
